@@ -25,3 +25,7 @@ p {
 h3 {
     word-break: break-all;
 }
+
+.table {
+    width: 1050px;
+}
