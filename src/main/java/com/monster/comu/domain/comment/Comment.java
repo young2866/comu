@@ -3,6 +3,7 @@ package com.monster.comu.domain.comment;
 import com.monster.comu.domain.BaseTimeEntity;
 import com.monster.comu.domain.post.Post;
 import com.monster.comu.domain.user.User;
+import com.monster.comu.dto.comment.CommentSaveRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,4 +38,5 @@ public class Comment extends BaseTimeEntity {
         this.post = post;
         this.user = user;
     }
+
 }
