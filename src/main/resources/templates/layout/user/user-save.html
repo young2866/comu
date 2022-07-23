@@ -13,8 +13,10 @@
 
             <div class="form-floating m-3">
                 <input type="text" class="form-control" id="username" placeholder="아이디를 입력하세요." required
-                       minlength="4" size="20">
+                       minlength="4" size="20" onfocusout="checkId()">
                 <label for="username">아이디</label>
+                <span class="id_ok">사용 가능한 아이디입니다.</span>
+                <span class="id_already">누군가 이 아이디를 사용하고 있어요.</span>
                 <div class="valid-feedback">
                     good!
                 </div>
@@ -66,6 +68,29 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script th:src="@{/js/validation.js}"></script>
 <script th:src="@{/js/user.js}"></script>
+<script type="text/javascript">
+    function checkId() {
+        let data = {username : $('#username').val()}
+        $.ajax({
+            url: `/auth/idCheck`,
+            method: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (res) {
+                if (res) {
+                    $('.id_already').css("display","inline-block");
+                    $('.id_ok').css("display", "none");
+                    $('#username').val('');
+                } else {
+                    $('.id_ok').css("display","inline-block");
+                    $('.id_already').css("display", "none");
+                }
+            }, error: function (err) {
+                console.log(err);
+            },
+        })
+    }
+</script>
 </body>
 
 </html>

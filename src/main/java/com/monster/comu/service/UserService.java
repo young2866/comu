@@ -32,4 +32,9 @@ public class UserService {
         principalDetail.setUser(userEntity);
         return userEntity.getId();
     }
+
+    @Transactional(readOnly = false)
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }
