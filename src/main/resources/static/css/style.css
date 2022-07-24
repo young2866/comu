@@ -29,12 +29,12 @@ h3 {
 .table {
     width: 1050px;
 }
-.id_ok{
+.id_ok, .password_ok, .email_ok, .nickname_ok{
     color:#008000;
     display: none;
 }
 
-.id_already{
-    color:#6A82FB;
+.id_already, .password_no, .email_no, .nickname_no {
+    color:#FF0000;
     display: none;
 }

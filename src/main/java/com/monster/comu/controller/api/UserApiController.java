@@ -18,6 +18,7 @@ public class UserApiController {
 
     @PostMapping("/auth/api/v1/user")
     public Long save(@RequestBody UserSaveRequestDto userSaveRequestDto) {
+
         return userService.save(userSaveRequestDto.toEntity());
     }
 
@@ -30,5 +31,15 @@ public class UserApiController {
     @PostMapping("/auth/idCheck")
     public boolean checkUsernameDuplicate(@RequestBody UserSaveRequestDto userSaveRequestDto) {
         return userService.existsByUsername(userSaveRequestDto.getUsername());
+    }
+
+    @PostMapping("/auth/emailCheck")
+    public boolean checkEmailDuplicate(@RequestBody UserSaveRequestDto userSaveRequestDto) {
+        return userService.existsByEmail(userSaveRequestDto.getEmail());
+    }
+
+    @PostMapping("/auth/nickCheck")
+    public boolean checkNicknameDuplicate(@RequestBody UserSaveRequestDto userSaveRequestDto) {
+        return userService.existsByNickname(userSaveRequestDto.getNickname());
     }
 }

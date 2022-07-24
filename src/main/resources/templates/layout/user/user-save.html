@@ -7,55 +7,34 @@
 <header th:replace="layout/header :: header"></header>
 
 <main class="form-signin">
-    <div class="container border rounded flex-md-row mb-4 shadow-sm h-md-250">
+    <div class="container border rounded flex-md-row mb-4 shadow-sm h-md-250" style="width: 350px;">
         <form id="needs-validation" novalidate>
             <h1 class="h3 m-3 fw-normal">회원가입</h1>
 
             <div class="form-floating m-3">
-                <input type="text" class="form-control" id="username" placeholder="아이디를 입력하세요." required
-                       minlength="4" size="20" onfocusout="checkId()">
+                <input type="text" class="form-control" id="username" placeholder="아이디를 입력하세요." required onfocusout="checkId()" >
                 <label for="username">아이디</label>
-                <span class="id_ok">사용 가능한 아이디입니다.</span>
-                <span class="id_already">누군가 이 아이디를 사용하고 있어요.</span>
-                <div class="valid-feedback">
-                    good!
-                </div>
-                <div class="invalid-feedback">
-                    아이디는 4자 이상 입력해야 합니다.
-                </div>
+                <span class="id_ok" style="display: none">사용 가능한 아이디입니다.</span>
+                <span class="id_already" style="display: none">누군가 이 아이디를 사용하고 있어요.</span>
             </div>
 
             <div class="form-floating m-3">
-                <input type="password" class="form-control" id="password" placeholder="패스워드를 입력하세요." required
-                       minlength="8" size="20">
-                <label for="password">패스워드</label>
-                <div class="valid-feedback">
-                    very good!
-                </div>
-                <div class="invalid-feedback">
-                    패스워드는 8자 이상 입력해야 합니다.
-                </div>
+                <input type="password" class="form-control" id="password" placeholder="패스워드를 입력하세요." required onfocusout="checkPassword()">
+                <label for="password" >패스워드</label>
+                <span class="password_ok"></span>
+                <span class="password_no"></span>
             </div>
             <div class="form-floating m-3">
-                <input type="email" class="form-control" id="email" placeholder="이메일을 입력하세요." required>
+                <input type="email" class="form-control" id="email" placeholder="이메일을 입력하세요." required onfocusout="checkEmail()">
                 <label for="email">이메일</label>
-                <div class="valid-feedback">
-                    nice!
-                </div>
-                <div class="invalid-feedback">
-                    이메일 형식으로 입력해야 합니다.
-                </div>
+                <span class="email_ok"></span>
+                <span class="email_no"></span>
             </div>
             <div class="form-floating m-3">
-                <input type="text" class="form-control" id="nickname" placeholder="닉네임을 입력하세요." required
-                       minlength="4" size="20">
+                <input type="text" class="form-control" id="nickname" placeholder="닉네임을 입력하세요." required onfocusout="checkNick()">
                 <label for="nickname">닉네임</label>
-                <div class="valid-feedback">
-                    very nice!
-                </div>
-                <div class="invalid-feedback">
-                    닉네임은 4자 이상 입력해야 합니다.
-                </div>
+                <span class="nickname_ok"></span>
+                <span class="nickname_no"></span>
             </div>
         </form>
         <button class="w-100 btn btn-lg btn-success" id="btn-save">회원가입</button>
@@ -71,24 +50,163 @@
 <script type="text/javascript">
     function checkId() {
         let data = {username : $('#username').val()}
-        $.ajax({
-            url: `/auth/idCheck`,
-            method: "POST",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            success: function (res) {
-                if (res) {
-                    $('.id_already').css("display","inline-block");
-                    $('.id_ok').css("display", "none");
-                    $('#username').val('');
-                } else {
-                    $('.id_ok').css("display","inline-block");
-                    $('.id_already').css("display", "none");
-                }
-            }, error: function (err) {
-                console.log(err);
-            },
-        })
+        var check = true;
+        if (idValid(data.username) && data.username != '') {
+            $.ajax({
+                url: `/auth/idCheck`,
+                method: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                async: false,
+                success: function (res) {
+                    if (res) {
+                        $('.id_already').text("이미 사용중인 아이디입니다.").css("display", "inline-block");
+                        $('.id_ok').text("사용 가능한 아이디입니다.").css("display", "none");
+                    } else {
+                        $('.id_ok').text("사용 가능한 아이디입니다.").css("display", "inline-block");
+                        $('.id_already').text("이미 사용중인 아이디입니다.").css("display", "none");
+                        check = res
+                    }
+
+                }, error: function (err) {
+                    console.log(err);
+                },
+            })
+        } else {
+            $('.id_already').text("아이디는 공백을 제외한 4자리 이상 14자리 이하 문자 또는 숫자로 구성하여야 합니다.").css("display", "inline-block");
+            $('.id_ok').css("display", "none");
+        }
+        function idValid(str) {
+            const pattern1 = /[0-9]/;
+            const pattern2 = /[a-zA-Z]/;
+            const pattern3 = /[\s]/g;
+
+            var textyn = (pattern1.test(str)||pattern2.test(str));
+            if (!textyn || pattern3.test(str) || str.length > 14 || str.length < 4) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+
+    }
+</script>
+<script type="text/javascript">
+    function checkPassword() {
+        let data = {password : $('#password').val()}
+        let check = true;
+        if (passwordValid(data.password) && data.password != '') {
+            $('.password_ok').text("사용 가능한 비밀번호 입니다.").css("display", "inline-block");
+            $('.password_no').css("display", "none");
+            check = false;
+        } else {
+            $('.password_no').text("비밀번호는는 공백을 제외한 8자리 이상 16자리 이하 영문, 숫자, 특수문자 중 2가지 이상 조합으로 구성하여야 합니다.").css("display", "inline-block");
+            $('.password_ok').css("display", "none");
+        }
+
+        function passwordValid(str) {
+            const regExp = /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&*()_+=]{8,16}$/;
+            const blank_pattern = /[\s]/g;
+
+            if (!regExp.test(str) || blank_pattern.test(str)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+        return check;
+    }
+</script>
+<script type="text/javascript">
+    function checkEmail() {
+        let data = {email : $('#email').val()}
+        let check = true;
+        if (emailValid(data.email) && data.email != '') {
+            $.ajax({
+                url: `/auth/emailCheck`,
+                method: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                async: false,
+                success: function (res) {
+                    if (res) {
+                        $('.email_no').text("이미 사용중인 이메일입니다.").css("display", "inline-block");
+                        $('.email_ok').text("사용 가능한 이메일입니다.").css("display", "none");
+                    } else {
+                        $('.email_ok').text("사용 가능한 이메일입니다.").css("display", "inline-block");
+                        $('.email_no').text("이미 사용중인 이메일입니다.").css("display", "none");
+                        check = res;
+                    }
+                }, error: function (err) {
+                    console.log(err);
+                },
+
+            });
+        } else {
+            $('.email_no').text("올바른 이메일 형식이 아닙니다.").css("display", "inline-block");
+            $('.email_ok').css("display", "none");
+        }
+
+        function emailValid(str) {
+            const pattern1 = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.[a-zA-Z]{2,4}$/
+            const pattern2 = /[\s]/g;
+
+            if (!pattern1.test(str) || pattern2.test(str)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+        return check;
+    }
+</script>
+<script type="text/javascript">
+    function checkNick() {
+        let data = {nickname : $('#nickname').val()}
+        let check = true;
+        if (nickValid(data.nickname) && data.nickname != '') {
+            $.ajax({
+                url: `/auth/nickCheck`,
+                method: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                async: false,
+                success: function (res) {
+                    if (res) {
+                        $('.nickname_no').text("이미 사용중인 닉네임입니다.").css("display", "inline-block");
+                        $('.nickname_ok').text("사용 가능한 닉네임입니다.").css("display", "none");
+                    } else {
+                        $('.nickname_ok').text("사용 가능한 닉네임입니다.").css("display", "inline-block");
+                        $('.nickname_no').text("이미 사용중인 닉네임입니다.").css("display", "none");
+                        check = res;
+                    }
+                }, error: function (err) {
+                    console.log(err);
+                },
+            });
+        } else {
+            $('.nickname_no').text("닉네임은 한글 또는 영문 또는 숫자를 포함한 2자리 이상 12자리 이하의 형식으로 구성해야 합니다.").css("display", "inline-block");
+            $('.nickname_ok').css("display", "none");
+        }
+
+        function nickValid(str) {
+            const pattern1 = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,12}$/;
+
+            if (!pattern1.test(str)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+        return check;
     }
 </script>
 </body>

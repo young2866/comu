@@ -3,11 +3,10 @@
 let index = {
     init: function () {
         $("#btn-save").on("click", () => { //this를 바인딩하기 위해 화샬표 함수 사용
-            let form = document.querySelector("#needs-validation");
-            if (form.checkValidity() == false) {
-                console.log("회원가입 안됨")
+            if (!checkId() && !checkEmail() && !checkNick() && !checkPassword()) {
+               this.save();
             } else {
-                this.save();
+                alert("잘못된 요청 입니다.")
             }
         });
         $("#btn-update").on("click", () => {
@@ -27,6 +26,7 @@ let index = {
             email: $("#email").val(),
             nickname: $("#nickname").val()
         }
+
 
         $.ajax({
             type: "POST", //Http method
@@ -61,6 +61,6 @@ let index = {
         }).fail(function (err) {
             alert(JSON.stringify(err));
         });
-    }
+    },
 }
 index.init();
