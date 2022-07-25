@@ -24,15 +24,10 @@
             </div>
 
             <div class="form-floating m-3">
-                <input type="password" class="form-control" id="password" placeholder="패스워드를 입력하세요." required
-                       minlength="8" size="20">
+                <input type="password" class="form-control" id="password" placeholder="패스워드를 입력하세요." onfocusout="checkPassword()" required>
                 <label for="password">패스워드</label>
-                <div class="valid-feedback">
-                    very good!
-                </div>
-                <div class="invalid-feedback">
-                    패스워드는 8자 이상 입력해야 합니다.
-                </div>
+                <span class="password_ok"></span>
+                <span class="password_no"></span>
             </div>
             <div class="form-floating m-3">
                 <input type="email" th:value="${#authentication.principal.email}" class="form-control" id="email" placeholder="이메일을 입력하세요." required readonly>
@@ -45,15 +40,11 @@
                 </div>
             </div>
             <div class="form-floating m-3">
-                <input type="text" th:value="${#authentication.principal.nickname}" class="form-control" id="nickname" placeholder="닉네임을 입력하세요." required
-                       minlength="4" size="20">
+                <input type="text" th:value="${#authentication.principal.nickname}" class="form-control" id="nickname" placeholder="닉네임을 입력하세요." onfocusout="checkNick()">
+                <input type="tex" th:value="${#authentication.principal.nickname}" id="nickname_save" style="display: none">
                 <label for="nickname">닉네임</label>
-                <div class="valid-feedback">
-                    very nice!
-                </div>
-                <div class="invalid-feedback">
-                    닉네임은 4자 이상 입력해야 합니다.
-                </div>
+                <span class="nickname_ok"></span>
+                <span class="nickname_no"></span>
             </div>
         </form>
         <button class="w-100 btn btn-lg btn-success" id="btn-update">회원수정</button>
@@ -69,6 +60,80 @@
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script th:src="@{/js/validation-update.js}"></script>
 <script th:src="@{/js/user.js}"></script>
+<script type="text/javascript">
+    function checkPassword() {
+        let data = {password : $('#password').val()}
+        let check = true;
+        if (passwordValid(data.password) && data.password != '') {
+            $('.password_ok').text("사용 가능한 비밀번호 입니다.").css("display", "inline-block");
+            $('.password_no').css("display", "none");
+            check = false;
+        } else {
+            $('.password_no').text("비밀번호는는 공백을 제외한 8자리 이상 16자리 이하 영문, 숫자, 특수문자 중 2가지 이상 조합으로 구성하여야 합니다.").css("display", "inline-block");
+            $('.password_ok').css("display", "none");
+        }
+
+        function passwordValid(str) {
+            const regExp = /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&*()_+=]{8,16}$/;
+            const blank_pattern = /[\s]/g;
+
+            if (!regExp.test(str) || blank_pattern.test(str)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+        return check;
+    }
+</script>
+<script type="text/javascript">
+    function checkNick() {
+        let data = {nickname : $('#nickname').val()}
+        let mynick = document.getElementById('nickname_save');
+        console.log(mynick.value);
+        console.log(data);
+        let check = true;
+        if (nickValid(data.nickname) && data.nickname != '') {
+            $.ajax({
+                url: `/auth/nickCheck`,
+                method: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                async: false,
+                success: function (res) {
+                    if (res && mynick.value != data.nickname) {
+                        $('.nickname_no').text("이미 사용중인 닉네임입니다.").css("display", "inline-block");
+                        $('.nickname_ok').text("사용 가능한 닉네임입니다.").css("display", "none");
+                    } else {
+                        $('.nickname_ok').text("사용 가능한 닉네임입니다.").css("display", "inline-block");
+                        $('.nickname_no').text("이미 사용중인 닉네임입니다.").css("display", "none");
+                        check = false;
+                    }
+                }, error: function (err) {
+                    console.log(err);
+                },
+            });
+        } else {
+            $('.nickname_no').text("닉네임은 한글 또는 영문 또는 숫자를 포함한 2자리 이상 12자리 이하의 형식으로 구성해야 합니다.").css("display", "inline-block");
+            $('.nickname_ok').css("display", "none");
+        }
+
+        function nickValid(str) {
+            const pattern1 = /^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,12}$/;
+
+            if (!pattern1.test(str)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        console.log(check);
+        return check;
+    }
+</script>
 </body>
 
 </html>

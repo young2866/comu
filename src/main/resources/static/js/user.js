@@ -10,11 +10,10 @@ let index = {
             }
         });
         $("#btn-update").on("click", () => {
-            let form = document.querySelector("#needs-validation");
-            if (form.checkValidity() == false) {
-                console.log("회원수정 안됨")
-            } else {
+            if (!checkNick() && !checkPassword()) {
                 this.update();
+            } else {
+                alert("잘못된 요청 입니다.")
             }
         });
     },

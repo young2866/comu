@@ -196,7 +196,7 @@
         }
 
         function nickValid(str) {
-            const pattern1 = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,12}$/;
+            const pattern1 = /^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,12}$/;
 
             if (!pattern1.test(str)) {
                 return false;
