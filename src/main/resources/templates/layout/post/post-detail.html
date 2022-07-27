@@ -20,7 +20,7 @@
         <th scope="row" th:text="${post.id}" id="id"></th>
         <td th:text="${post.user.username}"></td>
         <td th:text="${post.view}"></td>
-        <td th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd')}"></td>
+        <td th:text="${#temporals.createDate(post.createdDate, 'yyyy.MM.dd')}"></td>
     </tr>
     </tbody>
 </table>

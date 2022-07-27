@@ -1,5 +1,6 @@
 package com.monster.comu.config;
 
+import com.monster.comu.config.auth.CustomOAuth2UserService;
 import com.monster.comu.config.auth.PrincipalDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PrincipalDetailService principalDetailService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -26,14 +28,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                    .authorizeRequests()
-                    .antMatchers("/", "/auth/**", "/js/**", "/css/**", "/images/**").permitAll()
-                    .anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/", "/auth/**", "/js/**", "/css/**", "/images/**", "/login/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
-                    .formLogin()
-                    .loginPage("/auth/user/login")
-                    .loginProcessingUrl("/auth/user/login")
-                    .defaultSuccessUrl("/");
+                .formLogin()
+                .loginPage("/auth/user/login")
+                .loginProcessingUrl("/auth/user/login")
+                .defaultSuccessUrl("/")
+                .and()
+                .oauth2Login()
+                .loginPage("/auth/user/login")
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);
         http
                 .rememberMe().tokenValiditySeconds(60 * 60 * 7)
                 .userDetailsService(principalDetailService);

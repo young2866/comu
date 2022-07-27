@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application.yml
+application-oauth.yml
 /src/main/resources/application.yml
 
 .yml
