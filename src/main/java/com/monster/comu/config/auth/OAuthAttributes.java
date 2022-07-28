@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -21,8 +23,13 @@ public class OAuthAttributes {
     private String email;
     private Role role;
 
-    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {        /* 구글인지 네이버인지 카카오인지 구분하기 위한 메소드 (ofNaver, ofKaKao) */
-        return ofGoogle(userNameAttributeName, attributes);
+    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+        if("naver".equals(registrationId)) {
+            return ofNaver("id", attributes);
+        } else {
+            return ofGoogle(userNameAttributeName, attributes);
+        }
+
     }
 
     private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
@@ -31,6 +38,20 @@ public class OAuthAttributes {
                 .email((String) attributes.get("email"))
                 .nickname((String) attributes.get("name"))
                 .attributes(attributes)
+                .nameAttributeKey(userNameAttributeName)
+                .build();
+    }
+
+    private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+        log.info("naver response: " + response);
+
+        return OAuthAttributes.builder()
+                .username((String) response.get("email"))
+                .email((String) response.get("email"))
+                .nickname((String) response.get("nickname"))
+                .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }

@@ -4,6 +4,7 @@ import com.monster.comu.domain.user.User;
 import com.monster.comu.domain.user.UserRepository;
 import com.monster.comu.dto.user.UserSaveRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -18,6 +19,7 @@ import java.util.Collections;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
@@ -30,10 +32,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
+        log.info("registrationId : " + registrationId);
+
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
                 .getUserInfoEndpoint().getUserNameAttributeName();
 
+        log.info("================================");
+        log.info("userNameAttributeName : " + userNameAttributeName);
+
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+
+        log.info("================================");
+        log.info("getAttributes(): " + attributes.getAttributes());
 
         User user = saveOrUpdate(attributes);
 
@@ -46,6 +56,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = userRepository.findByEmail(attributes.getEmail())
                 .map(User::updateModifiedDate)
                 .orElse(attributes.toEntity());
+
         return userRepository.save(user);
     }
 }
